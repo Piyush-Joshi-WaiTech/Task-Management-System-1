@@ -73,3 +73,25 @@ body {
     margin-bottom: 8px;
   }
 }
+.glow-button {
+  background: linear-gradient(45deg, #007bff, #6610f2);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.glow-button:hover {
+  background: linear-gradient(45deg, #6610f2, #007bff);
+  box-shadow: 0 4px 25px rgba(0, 123, 255, 0.7);
+  transform: scale(1.1);
+}
+
+.glow-button:active {
+  transform: scale(0.95);
+}
