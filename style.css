@@ -39,8 +39,8 @@ body {
 }
 .close-btn {
   border: none;
-  background-color: #e5e8ec; /* Match the light gray background */
-  color: #333; /* Darker shade for visibility */
+  background-color: #e5e8ec;
+  color: #333;
   font-size: 16px;
   padding: 5px 10px;
   border-radius: 4px;

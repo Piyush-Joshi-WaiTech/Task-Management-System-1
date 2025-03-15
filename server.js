@@ -52,7 +52,7 @@ app.post("/add-task", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("MySQL Insert Error: ", err); // LOG ERROR TO CONSOLE
+        console.error("MySQL Insert Error: ", err);
         return res.json({ success: false, message: err.message });
       }
       res.json({ success: true });
