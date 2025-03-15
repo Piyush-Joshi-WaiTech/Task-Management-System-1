@@ -1,0 +1,206 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.nav-tabs .nav-link.active {
+  color: black;
+  font-weight: bold;
+}
+.nav-tabs {
+  border-bottom: none;
+}
+.nav-tabs .nav-link {
+  color: black;
+  border: none;
+  position: relative;
+}
+.nav-tabs .nav-link.active::after {
+  content: "";
+  display: block;
+  width: 50%;
+  height: 3px;
+  background-color: #007bff;
+  position: absolute;
+  bottom: -2px;
+  left: 25%;
+  border-radius: 10px;
+}
+.status-boxes .btn {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  color: black;
+  padding: 6px 12px;
+  box-shadow: none;
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.status-boxes .btn.active {
+  border-color: #007bff;
+  color: #007bff;
+  transform: scale(0.95);
+}
+
+.status-boxes .badge {
+  background-color: #f8f9fa;
+  color: black;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-weight: bold;
+}
+/* Different hover colors for each button */
+.status-boxes .btn-primary:hover {
+  background-color: #007bff; /* Vibrant Blue */
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  transform: translateY(-3px);
+}
+
+.status-boxes .btn-light:hover {
+  background-color: #ff9800; /* Warm Orange */
+  color: white;
+  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+  transform: translateY(-3px);
+}
+.card {
+  border-radius: 10px;
+}
+
+.task-item {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  padding: 15px;
+  border-bottom: 1px solid #ddd; /**/
+}
+.task-item:hover {
+  background-color: rgba(0, 123, 255, 0.1); /* Light blue hover effect */
+  transform: scale(1.02); /* Slight scaling for a modern feel */
+  cursor: pointer;
+}
+.task-item:hover .profile-pic {
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+/* Checkbox Styling */
+.rounded-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #007bff;
+  cursor: pointer;
+}
+.rounded-checkbox:checked {
+  background-color: #007bff;
+}
+
+/* Task Detail Section */
+.task-detail {
+  display: flex;
+  align-items: center;
+}
+
+/* Profile Icon Styling */
+.profile-icon {
+  border-right: 2px solid #ddd;
+  padding-right: 10px;
+  margin-right: 10px;
+}
+
+/* Profile Picture */
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+}
+.profile-initial {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background-color: #ff4081;
+  color: white;
+  text-align: center;
+  line-height: 40px;
+  border-radius: 5px;
+}
+
+/* Vertical Line Partition */
+.vertical-line {
+  border-left: 2px solid #ddd;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+/* Assigned To Section */
+.assigned-to {
+  display: flex;
+  justify-content: flex-end; /* Moves content to the right */
+  padding-right: 80px; /* Adjust this value for spacing */
+}
+.assigned-name {
+  font-weight: bold;
+  color: #333;
+}
+.assigned-section {
+  margin-left: auto; /* Pushes it to the right */
+  padding-right: 15px; /* Adjust spacing */
+}
+.flex-grow-line {
+  width: 100%;
+  height: 2px;
+  background-color: #ddd; /* Light grey line */
+  margin-top: -2px; /* Align with tab bottom */
+  flex-grow: 1;
+}
+
+.filter-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-icon {
+  width: 20px;
+  height: 20px;
+}
+/* Add Task Button Hover Effect */
+.btn-primary {
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #28a745; /* Fresh Green */
+  color: white;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+  transform: scale(1.05);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+/* Filter Button Hover Effect */
+.filter-btn {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.filter-btn:hover {
+  transform: rotate(15deg) scale(1.1);
+  filter: brightness(1.2);
+}
+
+.filter-btn:active {
+  transform: scale(0.9);
+}

@@ -72,7 +72,6 @@ app.get("/get-tasks", (req, res) => {
   });
 });
 
-// Serve static frontend files
 app.use(express.static("public"));
 
 // Start the server

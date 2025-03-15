@@ -24,7 +24,7 @@ document.getElementById("taskForm").addEventListener("submit", function (e) {
       if (data.success) {
         window.location.href = "task-details.html"; // Redirect on success
       } else {
-        alert("Error adding task. Please try again.");
+        alert("Fill out all fields. Please try again.");
       }
     })
     .catch((error) => console.error("Error:", error));
