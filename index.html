@@ -35,8 +35,8 @@
               >
               <div class="col-md-9">
                 <select id="task_owner" class="form-select">
-                  <option value="Piyush Joshi ">Piyush Joshi</option>
-                  <option value="Piyush Joshi ">Piyush Joshi</option>
+                  <option value="Piyush Joshi">Piyush Joshi</option>
+                  <option value="Piyush Joshi">Piyush Joshi</option>
                 </select>
               </div>
             </div>
@@ -130,10 +130,17 @@
       </div>
 
       <div class="button-container mt-3">
-        <button type="submit" class="btn btn-primary" form="taskForm">
+        <button type="button" class="btn btn-primary" onclick="submitForm()">
           Submit
         </button>
-        <button type="button" class="btn btn-primary">Submit and New</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="submitAndResetForm()"
+        >
+          Submit and New
+        </button>
+
         <button
           type="button"
           class="btn btn-secondary"
@@ -144,6 +151,6 @@
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>

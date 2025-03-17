@@ -5,48 +5,248 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Details</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
-    <script defer src="task-details.js"></script>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="public/css/dash-style.css" />
+
+    <style>
+      .avatar {
+        width: 40px;
+        height: 40px;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      .bg-pink {
+        background-color: #ff5c8d;
+      }
+    </style>
   </head>
   <body>
     <div class="container-fluid mt-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="ms-2">Task Details</h4>
-        <button class="glow-button" onclick="location.href='dashboard.html'">
-          Go to Dashboard
-        </button>
+      <!-- Navigation -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link" href="#">My Tasks</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Track Tasks</a></li>
+        <li class="nav-item">
+          <a class="nav-link active" href="#">All Tasks</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">Form View</a></li>
+      </ul>
+
+      <div class="flex-grow-line"></div>
+
+      <!-- Status Boxes & Add Task Button -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="status-boxes">
+          <button class="btn btn-primary active">
+            Total
+            <span class="badge bg-light text-dark" id="totalCount">0</span>
+          </button>
+          <button class="btn btn-light">
+            Open <span class="badge bg-light text-dark" id="openCount">0</span>
+          </button>
+          <button class="btn btn-light">
+            Completed
+            <span class="badge bg-light text-dark" id="completedCount">0</span>
+          </button>
+        </div>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-primary" onclick="location.href='index.html'">
+            Add Task
+          </button>
+          <button class="btn btn-light ms-2 filter-btn">
+            <img
+              src="./public/images/filter-icon.png"
+              alt="Filter"
+              class="filter-icon"
+              height="20px"
+              ;
+            />
+          </button>
+        </div>
       </div>
 
-      <div class="card wider-card mt-4">
-        <div class="card-body">
-          <h5 class="card-title">Task Details</h5>
-          <div class="divider"></div>
-
-          <!-- Table Wrapper -->
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Task Owner</th>
-                  <th>Task Name</th>
-                  <th>Description</th>
-                  <th>Start Date</th>
-                  <th>Due Date</th>
-                  <th>Reminder</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="taskTableBody">
-                <!-- Data will be loaded here -->
-              </tbody>
-            </table>
-          </div>
+      <!-- Task List -->
+      <div class="card mt-3">
+        <div class="card-header">Task Details</div>
+        <div class="card-body" id="taskContainer">
+          <!-- Dynamic Task Rows Will Be Injected Here -->
         </div>
       </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        fetch("http://localhost:3000/get-tasks")
+          .then((res) => res.json())
+          .then((tasks) => {
+            const container = document.getElementById("taskContainer");
+            const totalCount = tasks.length;
+            const openCount = tasks.filter(
+              (task) => task.status.toLowerCase() === "open"
+            ).length;
+            const completedCount = tasks.filter(
+              (task) => task.status.toLowerCase() === "completed"
+            ).length;
+
+            document.getElementById("totalCount").textContent = totalCount;
+            document.getElementById("openCount").textContent = openCount;
+            document.getElementById("completedCount").textContent =
+              completedCount;
+
+            tasks.forEach((task) => {
+              const taskRow = document.createElement("div");
+              taskRow.className =
+                "task-row d-flex align-items-center justify-content-between p-3 border-bottom";
+
+              const isCompleted = task.status.toLowerCase() === "completed";
+              const profileInitial = task.task_owner.charAt(0).toUpperCase();
+              const formattedDate = new Date(
+                task.start_date
+              ).toLocaleDateString();
+
+              taskRow.innerHTML = `
+                <div class="d-flex align-items-center">
+                  <input type="checkbox" class="form-check-input me-3" ${
+                    isCompleted ? "checked" : ""
+                  }>
+                  <div class="avatar bg-pink text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                    ${profileInitial}
+                  </div>
+                  <div>
+                    <div class="fw-bold">${task.task_name}</div>
+                    <small>${task.id} - ${
+                task.task_owner
+              } • ${formattedDate}</small>
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-warning" onclick="updateTask(${
+                    task.id
+                  })">Update</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteTask(${
+                    task.id
+                  })">Delete</button>
+                </div>
+
+              `;
+              container.appendChild(taskRow);
+            });
+          })
+          .catch((error) => console.error("Error fetching tasks:", error));
+      });
+    </script>
+    <!-- Update Task Modal -->
+    <div
+      class="modal fade"
+      id="updateModal"
+      tabindex="-1"
+      aria-labelledby="updateModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form id="updateTaskForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateModalLabel">Update Task</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <!-- Form Fields -->
+              <input type="hidden" id="update_task_id" />
+              <div class="mb-3">
+                <label for="update_task_owner" class="form-label"
+                  >Task Owner</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="update_task_owner"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update_task_name" class="form-label"
+                  >Task Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="update_task_name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update_description" class="form-label"
+                  >Description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="update_description"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="update_start_date" class="form-label"
+                  >Start Date</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="update_start_date"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update_due_date" class="form-label">Due Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="update_due_date"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update_reminder" class="form-label">Reminder</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="update_reminder"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update_priority" class="form-label">Priority</label>
+                <select class="form-select" id="update_priority">
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="update_status" class="form-label">Status</label>
+                <select class="form-select" id="update_status">
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/task-details.js"></script>
   </body>
 </html>

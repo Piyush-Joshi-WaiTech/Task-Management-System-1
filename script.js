@@ -1,7 +1,6 @@
-document.getElementById("taskForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const taskData = {
+// Helper to collect form data
+function getFormData() {
+  return {
     task_owner: document.getElementById("task_owner").value,
     task_name: document.getElementById("task_name").value,
     description: document.getElementById("description").value,
@@ -11,21 +10,53 @@ document.getElementById("taskForm").addEventListener("submit", function (e) {
     priority: document.getElementById("priority").value,
     status: document.getElementById("status").value,
   };
+}
+function submitForm() {
+  const taskData = getFormData();
 
   fetch("http://localhost:3000/add-task", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(taskData),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        window.location.href = "task-details.html"; // Redirect on success
-      } else {
-        alert("Fill out all fields. Please try again.");
+    .then(async (response) => {
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Server error: ${response.status} - ${text}`);
       }
+      return response.json();
     })
-    .catch((error) => console.error("Error:", error));
-});
+    .then((data) => {
+      alert(data.message);
+      window.location.href = "task-details.html";
+    })
+    .catch((error) => {
+      console.error("Error submitting task:", error.message);
+      alert("Failed to submit task");
+    });
+}
+
+function submitAndResetForm() {
+  const taskData = getFormData();
+
+  fetch("http://localhost:3000/add-task", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(taskData),
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Server error: ${response.status} - ${text}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      alert(data.message);
+      document.getElementById("taskForm").reset();
+    })
+    .catch((error) => {
+      console.error("Error submitting task:", error.message);
+      alert("Failed to submit task");
+    });
+}

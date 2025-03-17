@@ -1,12 +1,29 @@
 const express = require("express");
 const mysql = require("mysql2");
+const path = require("path");
 const cors = require("cors");
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// Database connection
+// ✅ Serve static files (JS, CSS) from 'public' folder
+app.use("/public", express.static(path.join(__dirname, "public")));
+
+// ✅ Serve HTML files at root URLs
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/index.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/task-details.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "task-details.html"));
+});
+
+// ✅ MySQL connection
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -14,15 +31,7 @@ const db = mysql.createConnection({
   database: "task_management",
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error("Database connection failed:", err);
-    process.exit(1); // Exit the server if DB fails
-  }
-  console.log("Connected to MySQL");
-});
-
-// Handle form submission from index.html
+// ✅ POST route to add task
 app.post("/add-task", (req, res) => {
   const {
     task_owner,
@@ -35,8 +44,8 @@ app.post("/add-task", (req, res) => {
     status,
   } = req.body;
 
-  const sql =
-    "INSERT INTO tasks (task_owner, task_name, description, start_date, due_date, reminder, priority, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  const sql = `INSERT INTO tasks (task_owner, task_name, description, start_date, due_date, reminder, priority, status)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
   db.query(
     sql,
@@ -52,29 +61,131 @@ app.post("/add-task", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("MySQL Insert Error: ", err);
-        return res.json({ success: false, message: err.message });
+        console.error("Insert Error:", err);
+        return res.status(500).json({ message: "Error adding task" });
       }
-      res.json({ success: true });
+      res
+        .status(200)
+        .json({ message: "Task added successfully", taskId: result.insertId });
     }
   );
 });
 
-// Fetch tasks for task-details.html
+// ✅ GET all tasks
 app.get("/get-tasks", (req, res) => {
-  const sql = "SELECT * FROM tasks";
+  const sql = "SELECT * FROM tasks ORDER BY id DESC";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching tasks:", err);
-      return res.json([]);
+      return res.status(500).json({ error: "Database error" });
     }
     res.json(results);
   });
 });
 
-app.use(express.static("public"));
+// ✅ GET single task by ID
+app.get("/get-task/:id", (req, res) => {
+  const taskId = req.params.id;
 
-// Start the server
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+  const sql = "SELECT * FROM tasks WHERE id = ?";
+  db.query(sql, [taskId], (err, result) => {
+    if (err) {
+      console.error("Error fetching task:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    res.json(result[0]);
+  });
+});
+
+app.put("/update-task/:id", (req, res) => {
+  const taskId = req.params.id;
+  const {
+    task_owner,
+    task_name,
+    description,
+    start_date,
+    due_date,
+    reminder,
+    priority,
+    status,
+  } = req.body;
+
+  // Convert empty string to NULL for reminder and priority
+  const reminderValue = reminder === "" ? null : reminder;
+  const priorityValue = priority === "" ? null : priority;
+
+  const sql =
+    "UPDATE tasks SET task_owner = ?, task_name = ?, description = ?, start_date = ?, due_date = ?, reminder = ?, priority = ?, status = ? WHERE id = ?";
+
+  db.query(
+    sql,
+    [
+      task_owner,
+      task_name,
+      description,
+      start_date,
+      due_date,
+      reminderValue,
+      priorityValue,
+      status,
+      taskId,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error("Update Error:", err);
+        res.status(500).json({ success: false, error: err.message });
+      } else {
+        res.json({ success: true });
+      }
+    }
+  );
+});
+
+// ✅ DELETE task (Updated to reset AUTO_INCREMENT)
+app.delete("/delete-task/:id", (req, res) => {
+  const taskId = req.params.id;
+
+  const deleteSql = "DELETE FROM tasks WHERE id = ?";
+  db.query(deleteSql, [taskId], (err, result) => {
+    if (err) {
+      console.error("Delete Error:", err);
+      return res.status(500).json({ success: false });
+    }
+
+    // ✅ After delete, get max ID and reset AUTO_INCREMENT
+    const maxIdSql = "SELECT MAX(id) AS max_id FROM tasks";
+    db.query(maxIdSql, (err, results) => {
+      if (err) {
+        console.error("Max ID Error:", err);
+        return res.status(500).json({ success: false });
+      }
+
+      const maxId = results[0].max_id || 0; // Handle null
+      const nextId = maxId + 1;
+
+      const resetSql = `ALTER TABLE tasks AUTO_INCREMENT = ${nextId}`;
+      db.query(resetSql, (err) => {
+        if (err) {
+          console.error("Reset AUTO_INCREMENT Error:", err);
+          return res.status(500).json({ success: false });
+        }
+
+        res.status(200).json({ success: true });
+      });
+    });
+  });
+});
+
+// ✅ Fallback 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Not Found" });
+});
+
+// ✅ Start server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
