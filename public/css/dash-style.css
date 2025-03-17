@@ -81,32 +81,32 @@ body {
   border-radius: 10px;
 }
 
-.task-item {
+.task-row {
   background-color: #ffffff;
   transition: background-color 0.3s ease, transform 0.2s ease;
   padding: 15px;
   border-bottom: 1px solid #ddd; /**/
 }
-.task-item:hover {
+.task-row:hover {
   background-color: rgba(0, 123, 255, 0.1); /* Light blue hover effect */
   transform: scale(1.02); /* Slight scaling for a modern feel */
   cursor: pointer;
 }
-.task-item:hover .profile-pic {
+.task-row:hover .profile-pic {
   transform: scale(1.1);
   transition: transform 0.2s ease-in-out;
 }
 
-.task-item:last-child {
+.task-row:last-child {
   border-bottom: none;
 }
 
 /* Checkbox Styling */
 .rounded-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 2px solid #007bff;
+  border: 5px solid #007bff;
   cursor: pointer;
 }
 .rounded-checkbox:checked {

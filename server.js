@@ -100,6 +100,7 @@ app.get("/get-task/:id", (req, res) => {
   });
 });
 
+// ✅ UPDATE task
 app.put("/update-task/:id", (req, res) => {
   const taskId = req.params.id;
   const {
@@ -113,7 +114,6 @@ app.put("/update-task/:id", (req, res) => {
     status,
   } = req.body;
 
-  // Convert empty string to NULL for reminder and priority
   const reminderValue = reminder === "" ? null : reminder;
   const priorityValue = priority === "" ? null : priority;
 
@@ -144,7 +144,7 @@ app.put("/update-task/:id", (req, res) => {
   );
 });
 
-// ✅ DELETE task (Updated to reset AUTO_INCREMENT)
+// ✅ DELETE task and reset AUTO_INCREMENT
 app.delete("/delete-task/:id", (req, res) => {
   const taskId = req.params.id;
 
@@ -155,7 +155,6 @@ app.delete("/delete-task/:id", (req, res) => {
       return res.status(500).json({ success: false });
     }
 
-    // ✅ After delete, get max ID and reset AUTO_INCREMENT
     const maxIdSql = "SELECT MAX(id) AS max_id FROM tasks";
     db.query(maxIdSql, (err, results) => {
       if (err) {
@@ -163,7 +162,7 @@ app.delete("/delete-task/:id", (req, res) => {
         return res.status(500).json({ success: false });
       }
 
-      const maxId = results[0].max_id || 0; // Handle null
+      const maxId = results[0].max_id || 0;
       const nextId = maxId + 1;
 
       const resetSql = `ALTER TABLE tasks AUTO_INCREMENT = ${nextId}`;
@@ -174,6 +173,34 @@ app.delete("/delete-task/:id", (req, res) => {
         }
 
         res.status(200).json({ success: true });
+      });
+    });
+  });
+});
+
+// ✅ DELETE ALL TASKS and RESET ID to 1
+app.delete("/delete-all-tasks", (req, res) => {
+  const deleteSql = "DELETE FROM tasks";
+  db.query(deleteSql, (err) => {
+    if (err) {
+      console.error("Delete All Tasks Error:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to delete all tasks" });
+    }
+
+    const resetSql = "ALTER TABLE tasks AUTO_INCREMENT = 1";
+    db.query(resetSql, (err) => {
+      if (err) {
+        console.error("Reset AUTO_INCREMENT Error:", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Failed to reset AUTO_INCREMENT" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "All tasks deleted and ID reset to 1",
       });
     });
   });

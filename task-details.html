@@ -9,6 +9,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
     <link rel="stylesheet" href="public/css/dash-style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 
     <style>
       .avatar {
@@ -31,7 +35,15 @@
         <li class="nav-item">
           <a class="nav-link active" href="#">All Tasks</a>
         </li>
-        <li class="nav-item"><a class="nav-link" href="#">Form View</a></li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#addTaskModal"
+            >Form View</a
+          >
+        </li>
       </ul>
 
       <div class="flex-grow-line"></div>
@@ -98,7 +110,7 @@
             tasks.forEach((task) => {
               const taskRow = document.createElement("div");
               taskRow.className =
-                "task-row d-flex align-items-center justify-content-between p-3 border-bottom";
+                "task-item d-flex align-items-center justify-content-between p-3 border-bottom";
 
               const isCompleted = task.status.toLowerCase() === "completed";
               const profileInitial = task.task_owner.charAt(0).toUpperCase();
@@ -122,6 +134,9 @@
                   </div>
                 </div>
                 <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-info">
+                    <i class="fa fa-list"></i>  
+                  </button>
                   <button class="btn btn-sm btn-warning" onclick="updateTask(${
                     task.id
                   })">Update</button>
@@ -137,6 +152,7 @@
           .catch((error) => console.error("Error fetching tasks:", error));
       });
     </script>
+
     <!-- Update Task Modal -->
     <div
       class="modal fade"
@@ -246,6 +262,246 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      id="deleteModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: #fff;
+          text-align: center;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+          max-width: 400px;
+          margin: auto;
+          position: relative;
+        "
+      >
+        <span
+          id="closeModalBtn"
+          style="
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+          "
+          >&times;</span
+        >
+        <div>
+          <div style="font-size: 40px; color: #e74c3c; margin-bottom: 10px">
+            &#9888;
+          </div>
+          <h4>Delete task?</h4>
+          <p>
+            Task will be permanently deleted. This action cannot be reversed.
+          </p>
+          <button id="confirmDeleteBtn" class="btn btn-danger">Confirm</button>
+          <button id="cancelDeleteBtn" class="btn btn-light">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!---->
+
+    <!-- Add Task Modal -->
+    <div
+      class="modal fade"
+      id="addTaskModal"
+      tabindex="-1"
+      aria-labelledby="addTaskModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="addTaskForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <!-- Form Fields -->
+              <div class="mb-3">
+                <label for="task_owner" class="form-label">Task Owner</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="task_owner"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="task_name" class="form-label">Task Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="task_name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                  class="form-control"
+                  id="description"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="start_date"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="due_date"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="reminder" class="form-label">Reminder</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="reminder"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select class="form-select" id="priority">
+                  <option>Low</option>
+                  <option>Medium</option>
+                  <option>High</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status">
+                  <option>Pending</option>
+                  <option>In Progress</option>
+                  <option>Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Add Task</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let deleteTaskId = null;
+
+      function deleteTask(taskId) {
+        deleteTaskId = taskId;
+        document.getElementById("deleteModal").style.display = "flex";
+      }
+
+      document.getElementById("closeModalBtn").addEventListener("click", () => {
+        document.getElementById("deleteModal").style.display = "none";
+      });
+
+      document
+        .getElementById("cancelDeleteBtn")
+        .addEventListener("click", () => {
+          document.getElementById("deleteModal").style.display = "none";
+        });
+
+      document
+        .getElementById("confirmDeleteBtn")
+        .addEventListener("click", () => {
+          if (deleteTaskId) {
+            fetch(`http://localhost:3000/delete-task/${deleteTaskId}`, {
+              method: "DELETE",
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  location.reload();
+                } else {
+                  alert("Failed to delete task.");
+                }
+              })
+              .catch((err) => {
+                console.error("Delete Error:", err);
+                alert("Error deleting task.");
+              })
+              .finally(() => {
+                document.getElementById("deleteModal").style.display = "none";
+              });
+          }
+        });
+
+      document
+        .getElementById("addTaskForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Stop form reload
+
+          const newTask = {
+            task_owner: document.getElementById("task_owner").value,
+            task_name: document.getElementById("task_name").value,
+            description: document.getElementById("description").value,
+            start_date: document.getElementById("start_date").value,
+            due_date: document.getElementById("due_date").value,
+            reminder: document.getElementById("reminder").value,
+            priority: document.getElementById("priority").value,
+            status: document.getElementById("status").value,
+          };
+
+          fetch("http://localhost:3000/add-task", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTask),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                // Close modal
+                const addTaskModalEl = document.getElementById("addTaskModal");
+                const addTaskModal =
+                  bootstrap.Modal.getInstance(addTaskModalEl);
+                addTaskModal.hide();
+
+                // Refresh task list (reload or fetch tasks again)
+                location.reload();
+              } else {
+                alert("Failed to add task.");
+              }
+            })
+            .catch((error) => console.error("Error adding task:", error));
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/public/task-details.js"></script>
   </body>
